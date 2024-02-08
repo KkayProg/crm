@@ -48,7 +48,22 @@ function newClientTr(client) {
         $dateCreareTd = document.createElement('td'),
         $lastChangeTd = document.createElement('td'),
         $contactsTd = document.createElement('td'),
-        $activityTd = document.createElement('td')
+        $activityTd = document.createElement('td'),
+        $changeTd = document.createElement('button'),
+        $deleteTd = document.createElement('button')
+
+    $changeTd.classList.add('btn', 'btnChange')
+    $changeTd.style.backgroundColor = 'white'
+    $changeTd.textContent = 'Изменить'
+    $changeTd.style.marginRight = '30px'
+
+    $deleteTd.classList.add('btn', 'btnDelete')
+    $deleteTd.style.backgroundColor = 'white'
+    $deleteTd.textContent = 'Удалить'
+
+    $clientTr.style.backgroundColor = 'white'
+    $clientTr.style.border = 'none'
+    $clientTr.style.borderBottom = '1px solid #C8C5D1'
 
     // запись данных
     $IDTd.textContent = client.id
@@ -64,6 +79,8 @@ function newClientTr(client) {
     $clientTr.append($lastChangeTd)
     $clientTr.append($contactsTd)
     $clientTr.append($activityTd)
+    $activityTd.append($changeTd)
+    $activityTd.append($deleteTd)
 
     return $clientTr;
 }

@@ -31,9 +31,9 @@
         <div class="container clients__container">
             <h1 class="clients__title">Клиенты</h1>
             <table class="clients__table">
-                <thead>
+                <thead class="clients__thead">
                     <th class="thId" data-column="ID">ID</th>
-                    <th data-column="fio">Фамилия Имя Отчество</th>
+                    <th class="thFio" data-column="fio">Фамилия Имя Отчество</th>
                     <th data-column="createdAt">Дата и время создания</th>
                     <th data-column="updatedAt">Последние изменения</th>
                     <th data-column="contacts">Контакты</th>
@@ -41,7 +41,7 @@
                 </thead>
                 <tbody id="clients__tbody" class="clients__tbody"></tbody>
             </table>
-            <button id="openModal">Добавить клиента</button>
+            <button id="openModal" class="clients__button">Добавить клиента</button>
             <div id="modal" class="modal">
                 <!-- <div class="modal-content">
                     <button class="close"><svg width="29" height="29" viewBox="0 0 29 29" fill="none"

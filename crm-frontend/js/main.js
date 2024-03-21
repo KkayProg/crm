@@ -15,8 +15,6 @@ async function serverGetStudent() {
 
 let serverData = await serverGetStudent();
 
-
-
 // добавление нового клиента на сервер
 async function serverAddStudent(obj) {
     const respons = await fetch(SERVER_URL + '/api/clients', {
@@ -41,12 +39,16 @@ async function serverDelStudent(id) {
 }
 
 // редактирование клиента на сервере
-async function serverShangeStudent(id) {
-    const respons = await fetch(SERVER_URL + '/api/clients/' + id, {
+async function serverChangeStudent(newData) {
+    const respons = await fetch(SERVER_URL + '/api/clients/' + newData.id, {
         method: 'PATCH',
-    })
-    let data = await respons.json()
-    return data
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newData), // Передача новых данных клиента в теле запроса
+    });
+    let data = await respons.json();
+    return data;
 }
 
 
@@ -67,6 +69,7 @@ function getСorrectDateformat(date) {
     if (mm < 10) mm = '0' + mm;
     return dd + '.' + mm + '.' + yyyy + ' ';
 }
+
 function getСorrectDateformatMinutes(date) {
     let $DateColor = document.createElement('div')
     $DateColor.classList.add('hours')
@@ -124,20 +127,78 @@ function newClientTr(client) {
     $dateCreareMinutesCreateTd = getСorrectDateformatMinutes(new Date(client.createdAt))
     $dateCreareMinutesChangeTd = getСorrectDateformatMinutes(new Date(client.updatedAt))
 
+    // появление иконок контактов
+    const imgPhone = document.createElement("img"),
+        imgEmail = document.createElement("img"),
+        imgVK = document.createElement("img"),
+        imgFacebook = document.createElement("img"),
+        imgOther = document.createElement("img");
 
-    $clientTr.append($IDTd)
-    $clientTr.append($fioTd)
-    $clientTr.append($dateCreareTd)
+    // Устанавливаем атрибут src для загрузки SVG файла
+    imgPhone.src = "../img/phoneIcon.svg",
+        imgEmail.src = "../img/mailIcon.svg",
+        imgVK.src = "../img/vkIcon.svg",
+        imgFacebook.src = "../img/facebookIcon.svg",
+        imgOther.src = "../img/otherIcon.svg"
+
+
+    // Добавляем img в DOM
+    for (const contact of client.contacts) {
+        switch (contact.type) {
+            case 'Телефон':
+                // код, который будет выполнен, если тип контакта - Телефон
+                $contactsTd.append(imgPhone)
+                break;
+            case 'Доп. телефон':
+                // код, который будет выполнен, если тип контакта - Доп. телефон
+                break;
+            case 'email':
+                // код, который будет выполнен, если тип контакта - email
+                $contactsTd.append(imgEmail)
+                break;
+            case 'vk':
+                // код, который будет выполнен, если тип контакта - vk
+                $contactsTd.append(imgVK)
+                break;
+            case 'facebook':
+                // код, который будет выполнен, если тип контакта - facebook
+                $contactsTd.append(imgFacebook)
+                break;
+            default:
+                // код, который будет выполнен, если тип контакта не соответствует ни одному из case
+        }
+    }
+
+    // Добавляем img в DOM
+    for (const contact of client.contacts) {
+        let img = null;
+        switch (contact.type) {
+            case 'Телефон':
+                img = imgPhone;
+                break;
+            case 'email':
+                img = imgEmail;
+                break;
+            case 'vk':
+                img = imgVK;
+                break;
+            case 'facebook':
+                img = imgFacebook;
+                break;
+            default:
+                img = imgOther;
+        }
+    }
+
+
+
+    $clientTr.append($IDTd, $fioTd, $dateCreareTd, $lastChangeTd, $contactsTd, $activityTd)
     $dateCreareTd.append($dateCreareMinutesCreateTd)
-    $clientTr.append($lastChangeTd)
     $lastChangeTd.append($dateCreareMinutesChangeTd)
-    $clientTr.append($contactsTd)
-    $clientTr.append($activityTd)
-    $activityTd.append($changeTd)
-    $activityTd.append($deleteTd)
+    $activityTd.append($changeTd, $deleteTd)
 
 
-    /////////// модальное окно удаления клиента
+    // модальное окно удаления клиента
     const $modalDelete = document.querySelector('#modalDelete');
 
     function modalDelClient() {
@@ -160,11 +221,7 @@ function newClientTr(client) {
         $modalDeleteCancel.classList.add('modalDeleteCancel')
 
         $modalDelete.append($modalDeleteActive)
-        $modalDeleteActive.append($modalDeleteH1)
-        $modalDeleteActive.append($modalDeleteP)
-        $modalDeleteActive.append($modalDeleteClose)
-        $modalDeleteActive.append($modalDeleteButton)
-        $modalDeleteActive.append($modalDeleteCancel)
+        $modalDeleteActive.append($modalDeleteH1, $modalDeleteP, $modalDeleteClose, $modalDeleteButton, $modalDeleteCancel)
 
         // закрыть окно нажав на крестик
         $modalDeleteClose.onclick = function () {
@@ -190,77 +247,260 @@ function newClientTr(client) {
         }
     }
 
-    /////////// модальное окно изменения клиента
+    // модальное окно изменения клиента
     const $modalChange = document.querySelector('#modalChange');
+    const $modalChangeSaveButton = document.createElement('button'); // Перемещаем создание кнопки сохранения за пределы функции
+
+    // Установка обработчика кнопки сохранения
+    $modalChangeSaveButton.textContent = 'Сохранить';
+    $modalChangeSaveButton.classList.add('btnSave');
+    $modalChangeSaveButton.onclick = async function () {
+        await serverChangeStudent(client.id);
+        $modalChange.style.display = 'none';
+        $clientTr.remove();
+    };
 
     function modalChangeClient() {
         $modalChange.style.display = 'block';
-        const $modalChangeActive = document.createElement('div')
-        $modalChangeActive.classList.add('modalChangeActive')
-        const $modalChangeClose = document.createElement('div') // кнопка крестика
-        $modalChangeClose.classList.add('modalCloseButton')
-        const $modalChangeTitle = document.createElement('div')
-        $modalChangeTitle.classList.add('flex')
-        const $modalChangeH1 = document.createElement('h1') // h1 Изменить данные
-        $modalChangeH1.textContent = 'Изменить данные'
-        $modalChangeH1.classList.add('modalChangeH1')
-        let $modalChangePID = document.createElement('p') // ID клиента справа от "Изменить данные"
-        $modalChangePID.classList.add('modalChangePID')
-        $modalChangePID.textContent = 'ID: ' + client.id // здесь будет передаваться ID клиента
-        let $surnameInputAbove = document.createElement('p') // фамилия пометка
-        $surnameInputAbove.textContent = 'Фамилия*'
-        $surnameInputAbove.classList = 'surnameInputAbove'
-        let $surnameInput = document.createElement('input') // фамилия
-        $surnameInput.value = client.surname
-        $surnameInput.classList.add('modalNameChange')
-        let $nameInputAbove = document.createElement('p') // имя пометка
-        $nameInputAbove.textContent = 'Имя*'
-        $nameInputAbove.classList = 'surnameInputAbove'
-        let $nameInput = document.createElement('input') // имя
-        $nameInput.value = client.name
-        $nameInput.classList.add('modalNameChange')
-        let $lastnameInputAbove = document.createElement('p') // отчество поментка
-        $lastnameInputAbove.textContent = 'Отчество*'
-        $lastnameInputAbove.classList = 'surnameInputAbove'
-        let $lastnameInput = document.createElement('input') // отчество 
-        $lastnameInput.value = client.lastName
-        $lastnameInput.classList.add('modalNameChange')
+        const $modalChangeActive = document.createElement('div');
+        $modalChangeActive.classList.add('modalChangeActive');
+        const $modalChangeClose = document.createElement('div'); // кнопка крестика
+        $modalChangeClose.classList.add('modalCloseButton');
+        const $modalChangeTitle = document.createElement('div');
+        $modalChangeTitle.classList.add('flex');
+        const $modalChangeH1 = document.createElement('h1'); // h1 Изменить данные
+        $modalChangeH1.textContent = 'Изменить данные';
+        $modalChangeH1.classList.add('modalChangeH1');
+        let $modalChangePID = document.createElement('p'); // ID клиента справа от "Изменить данные"
+        $modalChangePID.classList.add('modalChangePID');
+        $modalChangePID.textContent = 'ID: ' + client.id; // здесь будет передаваться ID клиента
+        let $surnameInputAbove = document.createElement('p'); // фамилия пометка
+        $surnameInputAbove.textContent = 'Фамилия*';
+        $surnameInputAbove.classList = 'surnameInputAbove';
+        let $surnameInput = document.createElement('input'); // фамилия
+        $surnameInput.value = client.surname;
+        $surnameInput.classList.add('modalNameChange');
+        let $nameInputAbove = document.createElement('p'); // имя пометка
+        $nameInputAbove.textContent = 'Имя*';
+        $nameInputAbove.classList = 'surnameInputAbove';
+        let $nameInput = document.createElement('input'); // имя
+        $nameInput.value = client.name;
+        $nameInput.classList.add('modalNameChange');
+        let $lastnameInputAbove = document.createElement('p'); // отчество пометка
+        $lastnameInputAbove.textContent = 'Отчество*';
+        $lastnameInputAbove.classList = 'surnameInputAbove';
+        let $lastnameInput = document.createElement('input'); // отчество 
+        $lastnameInput.value = client.lastName;
+        $lastnameInput.classList.add('modalNameChange');
 
-        const $modalChangeSaveButton = document.createElement('button') // кнопка сохранения
-        $modalChangeSaveButton.classList.add('btnSave')
-        $modalChangeSaveButton.textContent = 'Сохранить'
+        const $modalChangeSaveButton = document.createElement('button');
+        $modalChangeSaveButton.textContent = 'Сохранить';
+        $modalChangeSaveButton.classList.add('btnSave');
+
+        let $divOpenContacts = document.createElement('div')
+        $divOpenContacts.classList.add('divOpenContacts')
+        // кнопка открытия добавления контактов
+        const $btnOpenContacts = document.createElement('div')
+        $btnOpenContacts.textContent = 'Добавить контакт'
+        $btnOpenContacts.classList.add('btnOpenContacts')
+
+        // форма по добавлению контактов
+        const $form = document.createElement('form'); // Создаем новую форму
+        $form.id = 'form__change';
+        $form.classList.add('form__change')
+
+
+        // Проверяем, есть ли контакты у клиента
+        if (client.contacts.length !== 0) {
+            // Перебираем контакты и добавляем их в форму
+            client.contacts.forEach((contact) => {
+                const $styleInput = document.createElement('div');
+                $styleInput.classList.add('styleInput');
+
+                // Создаем выпадающий список
+                const select = document.createElement('select');
+                select.classList.add('modalSelect');
+                select.name = 'contact';
+
+                // Создаем опции для выпадающего списка
+                const options = ['Телефон', 'Доп. телефон', 'email', 'vk', 'facebook'];
+                options.forEach(optionValue => {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionValue[0].toUpperCase() + optionValue.slice(1); // Первая буква в верхнем регистре
+                    select.appendChild(option);
+                });
+
+                const $inputCloseBtn = document.createElement('button')
+                $inputCloseBtn.classList.add('inputCloseBtn')
+
+                // Создаем текстовое поле
+                const inputText = document.createElement('input');
+                inputText.classList.add('modalInput');
+                inputText.type = 'text';
+                inputText.name = 'context';
+                inputText.placeholder = 'Введите данные контакта';
+                inputText.value = contact.value; // Устанавливаем значение контакта в поле ввода
+                select.value = contact.type; // Устанавливаем значение типа контакта в выпадающем списке
+
+                // Добавляем элементы в форму
+                $styleInput.appendChild(select);
+                $styleInput.appendChild(inputText);
+                $styleInput.append($inputCloseBtn);
+                $form.appendChild($styleInput);
+
+                $modalChange.innerHTML = ''
+            });
+        }
+
+
+        $btnOpenContacts.onclick = function () {
+            $form.style.display = 'block'
+            const $styleInput = document.createElement('div')
+            $styleInput.classList.add('styleInput')
+            // Создаем выпадающий список
+            const select = document.createElement('select');
+            select.classList.add('modalSelect')
+            select.id = 'contact';
+            select.name = 'contact';
+
+            // Создаем опции для выпадающего списка
+            const options = ['Телефон', 'Доп. телефон', 'email', 'vk', 'facebook'];
+            options.forEach(optionValue => {
+                const option = document.createElement('option');
+                option.value = optionValue;
+                option.textContent = optionValue[0].toUpperCase() + optionValue.slice(1); // Первая буква в верхнем регистре
+                select.appendChild(option);
+            });
+
+            // Создаем текстовое поле
+            const inputText = document.createElement('input');
+            inputText.classList.add('modalInput')
+            inputText.type = 'text';
+            inputText.name = 'context';
+            inputText.placeholder = 'Введите данные контакта'
+
+            // кнопка удаление контакта
+            const $inputCloseBtn = document.createElement('button')
+            $inputCloseBtn.classList.add('inputCloseBtn')
+
+            // Создаем кнопку отправки
+            const submitButton = $modalChangeSaveButton;
+            submitButton.type = 'submit';
+
+
+            // Добавляем элементы в форму
+            $form.appendChild($styleInput);
+            $styleInput.appendChild(select);
+            $styleInput.appendChild(inputText);
+            $styleInput.append($inputCloseBtn);
+            $divOpenContacts.insertBefore($form, $btnOpenContacts);
+
+            ////////////////////////////////
+            // Удалить контакт с сервера
+
+                $inputCloseBtn.onclick = function(event) {
+                    event.preventDefault()
+
+                const newData = {
+                    id: client.id,
+                    name: $nameInput.value,
+                    surname: $surnameInput.value,
+                    lastName: $lastnameInput.value,
+                    contacts: []
+                };
+                for (const child of $form.children) {
+                    newData.contacts.remove() ({
+                        type: child.querySelector('select').value,
+                        value: child.querySelector('input').value
+                    })
+                }
+                // Вызываем функцию для изменения данных клиента на сервере
+                // await serverChangeStudent(newData);
+
+                // После успешного изменения данных на сервере, обновляем локальный список клиентов
+                // clientsList = await serverGetStudent();
+
+                // Перерисовываем таблицу с новыми данными
+                render();
+
+                $modal.style.display = 'none';
+                $form.remove(); // Удаление формы из DOM
+
+                // Закрываем модальное окно
+                // $modalChange.style.display = 'none';
+
+                $styleInput.remove();
+                // Проверяем, остался ли только один ребенок в форме
+                if ($form.children.length === 0) {
+                    $form.remove();
+                }
+            }
+            ////////////////////////////////////
+
+            // Удалить инпут из формы
+            $inputCloseBtn.onclick = function(event) {
+                event.preventDefault()
+                $styleInput.remove();
+                // Проверяем, остался ли только один ребенок в форме
+                if ($form.children.length === 0) {
+                    $form.remove();
+                }
+            };
+
+        }
+
+        // Установка обработчика кнопки сохранения
+        $modalChangeSaveButton.onclick = async function () {
+            const newData = {
+                id: client.id,
+                name: $nameInput.value,
+                surname: $surnameInput.value,
+                lastName: $lastnameInput.value,
+                contacts: []
+            };
+            for (const child of $form.children) {
+                newData.contacts.push({
+                    type: child.querySelector('select').value,
+                    value: child.querySelector('input').value
+                })
+            }
+            // Вызываем функцию для изменения данных клиента на сервере
+            await serverChangeStudent(newData);
+
+            // После успешного изменения данных на сервере, обновляем локальный список клиентов
+            clientsList = await serverGetStudent();
+
+            // Перерисовываем таблицу с новыми данными
+            render();
+
+            $modal.style.display = 'none';
+            $form.remove(); // Удаление формы из DOM
+
+            // Закрываем модальное окно
+            $modalChange.style.display = 'none';
+        };
+
+
 
         $modalChange.append($modalChangeActive)
-        $modalChangeActive.append($modalChangeClose)
-        $modalChangeActive.append($modalChangeTitle)
-        $modalChangeTitle.append($modalChangeH1)
-        $modalChangeTitle.append($modalChangePID)
-        $modalChangeActive.append($surnameInputAbove)
-        $modalChangeActive.append($surnameInput)
-        $modalChangeActive.append($nameInputAbove)
-        $modalChangeActive.append($nameInput)
-        $modalChangeActive.append($lastnameInputAbove)
-        $modalChangeActive.append($lastnameInput)
-        $modalChangeActive.append($modalChangeSaveButton)
+        $modalChangeActive.append($modalChangeClose, $modalChangeTitle, $surnameInputAbove, $surnameInput, $nameInputAbove, $nameInput, $lastnameInputAbove, $lastnameInput, $divOpenContacts, $modalChangeSaveButton)
+        $modalChangeTitle.append($modalChangeH1, $modalChangePID)
+        $divOpenContacts.append($btnOpenContacts)
 
         // закрыть окно нажав на крестик
         $modalChangeClose.onclick = function () {
             $modalChange.style.display = 'none';
+            $form.remove(); // Удаление формы из DOM
         }
 
         // закрыть окно нажав мимо него
         window.onclick = function (event) {
             if (event.target == $modalChange) {
                 $modalChange.style.display = 'none';
+                $form.remove(); // Удаление формы из DOM
             }
         };
-
-        // ЭТО НЕ РАБОТЕТ :(
-        // $modalChangeSaveButton.onclick = async function () {
-        //     await serverShangeStudent(client.id)
-        //     $modalChange.style.display = 'none';
-        //     $clientTr.remove()
-        // }
     }
 
     return $clientTr
@@ -277,16 +517,13 @@ const $btn = document.querySelector('#openModal');
 $btn.onclick = function () {
     $modal.style.display = 'block';
 
+    $modal.innerHTML = '';
+
     // построение модального окна для добавления клиента
-    let $modalDiv = document.createElement('div')
-    $modalDiv.style.width = '400px'
-    $modalDiv.style.minHeight = '450px'
-    $modalDiv.style.backgroundColor = 'white'
-    $modalDiv.style.position = 'absolute'
-    $modalDiv.style.left = '50%'
-    $modalDiv.style.top = '50%'
-    $modalDiv.style.transform = 'translate(-50%, -50%)'
-    $modalDiv.style.padding = '24px 30px'
+    const $modalDiv = document.createElement('div')
+    $modalDiv.classList.add('modalAddDiv')
+    const $modalDivFio = document.createElement('div')
+    $modalDivFio.classList.add('modalDivFio')
 
     let $modalTitile = document.createElement('h2')
     $modalTitile.textContent = 'Новый клиент'
@@ -304,41 +541,126 @@ $btn.onclick = function () {
     $lastnameInput.placeholder = 'Отчество'
     $lastnameInput.classList.add('modalName')
 
-    //
+    // кнопка закрытия модального окна
     let $modalCloseButton = document.createElement('div')
     $modalCloseButton.classList.add('modalCloseButton')
 
     // кнопка сохранения 
-    let $modalSaveButton = document.createElement('button')
+    const $modalSaveButton = document.createElement('button')
     $modalSaveButton.textContent = 'Сохранить'
     $modalSaveButton.classList.add('btnSave')
 
+    // кнопка удалить клиента 
+    const $modalDelP = document.createElement('p')
+    $modalDelP.textContent = 'Отмена'
+    $modalDelP.classList.add('modalDelP')
+
+
+    let $divOpenContacts = document.createElement('div')
+    $divOpenContacts.classList.add('divOpenContacts')
+    // кнопка открытия добавления контактов
+    const $btnOpenContacts = document.createElement('div')
+    $btnOpenContacts.textContent = 'Добавить контакт'
+    $btnOpenContacts.classList.add('btnOpenContacts')
+
     $modal.append($modalDiv)
-    $modalDiv.append($modalTitile)
-    $modalDiv.append($surnameInput)
-    $modalDiv.append($nameInput)
-    $modalDiv.append($lastnameInput)
-    $modalDiv.append($modalSaveButton)
-    $modalDiv.append($modalCloseButton)
+    $modalDiv.append($modalDivFio, $divOpenContacts, $modalSaveButton, $modalCloseButton, $modalDelP)
+    $modalDivFio.append($modalTitile, $surnameInput, $nameInput, $lastnameInput)
+    $divOpenContacts.append($btnOpenContacts)
 
-    $modalSaveButton.onclick = async function () {
-        let clientServer = {
-            name: $nameInput.value,
-            surname: $surnameInput.value,
-            lastName: $lastnameInput.value,
+
+    // форма по добавлению контактов
+    const $form = document.createElement('form'); // Создаем новую форму
+    $form.id = 'form__change';
+    $form.classList.add('form__change')
+
+    $btnOpenContacts.onclick = function () {
+        $form.style.display = 'block'
+        const $styleInput = document.createElement('div')
+        $styleInput.classList.add('styleInput')
+        // Создаем выпадающий список
+        const select = document.createElement('select');
+        select.classList.add('modalSelect')
+        select.id = 'contact';
+        select.name = 'contact';
+
+        // Создаем опции для выпадающего списка
+        const options = ['Телефон', 'Доп. телефон', 'email', 'vk', 'facebook'];
+        options.forEach(optionValue => {
+            const option = document.createElement('option');
+            option.value = optionValue;
+            option.textContent = optionValue[0].toUpperCase() + optionValue.slice(1); // Первая буква в верхнем регистре
+            select.appendChild(option);
+        });
+
+        // Создаем текстовое поле
+        const inputText = document.createElement('input');
+        inputText.classList.add('modalInput')
+        inputText.type = 'text';
+        inputText.name = 'context';
+        inputText.placeholder = 'Введите данные контакта'
+
+        //
+        const $inputCloseBtn = document.createElement('button')
+        $inputCloseBtn.classList.add('inputCloseBtn')
+
+        // Создаем кнопку отправки
+        const submitButton = $modalSaveButton;
+        submitButton.type = 'submit';
+
+        // Добавляем элементы в форму
+        $form.appendChild($styleInput);
+        $styleInput.appendChild(select);
+        $styleInput.appendChild(inputText);
+        $styleInput.append($inputCloseBtn);
+        $divOpenContacts.insertBefore($form, $btnOpenContacts);
+
+        // Удалить инпут из формы
+        $inputCloseBtn.onclick = function(event) {
+            event.preventDefault()
+            $styleInput.remove();
+            // Проверяем, остался ли только один ребенок в форме
+            if ($form.children.length === 0) {
+                $form.remove();
+            }
         };
-        let serverDataObj = await serverAddStudent(clientServer);
 
-        clientsList.push(
-            serverDataObj.name,
-            serverDataObj.surname,
-            serverDataObj.lastName
-        )
-        $modal.style.display = 'none';
-        location.reload();
+        $modalSaveButton.onclick = async function () {
+            let clientServer = {
+                name: $nameInput.value,
+                surname: $surnameInput.value,
+                lastName: $lastnameInput.value,
+                contacts: []
+            };
+
+            for (const child of $form.children) {
+                clientServer.contacts.push({
+                    type: child.querySelector('select').value,
+                    value: child.querySelector('input').value
+                })
+            }
+
+            // Добавление нового клиента на сервер
+            let serverDataObj = await serverAddStudent(clientServer);
+
+            // Получение актуальных данных о клиентах с сервера
+            clientsList = await serverGetStudent();
+
+            // Перерисовка таблицы с новыми данными
+            render();
+
+            $modal.style.display = 'none';
+            $form.remove(); // Удаление формы из DOM
+        }
     }
 
+    // закрытие модального окнда добавления клиента через кнопку крестика
     $modalCloseButton.onclick = function () {
+        $modal.style.display = 'none';
+    }
+
+    // закрытие модального окнда добавления клиента через кнопки отмена
+    $modalDelP.onclick = function () {
         $modal.style.display = 'none';
     }
 };
@@ -357,6 +679,7 @@ window.onclick = function (event) {
 let $tbody = document.getElementById('clients__tbody');
 
 function render() {
+    $tbody.innerHTML = ''
     for (const i of clientsList) {
         $tbody.append(newClientTr(i))
     }

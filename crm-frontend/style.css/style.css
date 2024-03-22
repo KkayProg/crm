@@ -201,6 +201,7 @@ h2 {
 }
 
 .btnOpenContacts {
+    margin: 0;
     padding: 8px 0;
     font-family: Open Sans;
     font-size: 14px;
@@ -209,7 +210,7 @@ h2 {
     letter-spacing: 0em;
     text-align: center;
     background-image: url(../img/plus.svg);
-    background-position: 145px center;
+    background-position: 120px center;
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -335,10 +336,8 @@ table img {
 
 .form__change {
     display: none;
-    padding: 25px 30px;
+    margin-bottom: 15px;
 }
-
-
 
 /* ////////////////////// */
 
@@ -373,10 +372,9 @@ table img {
 }
 
 .modalChangeH1 {
+    display: flex;
     margin: 0;
-    margin-right: 9px;
     margin-bottom: 16px;
-    display: inline;
     font-family: Open Sans;
     font-size: 18px;
     font-weight: 700;
@@ -387,6 +385,7 @@ table img {
 .modalChangePID {
     margin: 0;
     margin-top: 6px;
+    margin-left: 5px;
     font-family: Open Sans;
     font-size: 12px;
     font-weight: 400;

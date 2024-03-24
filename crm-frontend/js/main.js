@@ -81,6 +81,11 @@ function getСorrectDateformatMinutes(date) {
     return $DateColor
 }
 
+// 
+let $search = document.querySelector('#search')
+
+console.log($search.value);
+
 // modal window
 const $modal = document.querySelector('#modal');
 const $btn = document.querySelector('#openModal');
@@ -257,8 +262,6 @@ function newClientTr(client) {
         }
     }
 
-
-
     return $clientTr
 }
 
@@ -308,11 +311,13 @@ function clientModal(client = null) {
 
 
     let $surnameInput = document.createElement('input') // фамилия
-    $surnameInput.placeholder = 'Фамилия'
+    $surnameInput.placeholder = 'Фамилия*'
     $surnameInput.classList.add('modalName')
+    $surnameInput.required = true
     let $nameInput = document.createElement('input') // имя
-    $nameInput.placeholder = 'Имя'
+    $nameInput.placeholder = 'Имя*'
     $nameInput.classList.add('modalName')
+    $nameInput.required = true
     let $lastnameInput = document.createElement('input') // отчество 
     $lastnameInput.placeholder = 'Отчество'
     $lastnameInput.classList.add('modalName')
@@ -363,7 +368,6 @@ function clientModal(client = null) {
     }
 
     $modalSaveButton.onclick = async function () {
-        createFormModal($divOpenContacts, $btnOpenContacts, contact.type, contact.value)
         let clientServer = {
             name: $nameInput.value,
             surname: $surnameInput.value,
@@ -372,10 +376,11 @@ function clientModal(client = null) {
         };
 
         // for (const child of $form.children) {
-        //         clientServer.contacts.push({
-        //             type: child.querySelector('select').value,
-        //             value: child.querySelector('input').value
-        //         })
+        //     console.log(child);
+        //     clientServer.contacts.push({
+        //         type: child.querySelector('select').value,
+        //         value: child.querySelector('input').value
+        //     })
         // }
 
         // Добавление нового клиента на сервер
@@ -412,7 +417,7 @@ function clientModal(client = null) {
         $nameInput.classList.add('modalNameChange');
 
         let $lastnameInputAbove = document.createElement('p'); // отчество пометка
-        $lastnameInputAbove.textContent = 'Отчество*';
+        $lastnameInputAbove.textContent = 'Отчество';
         $lastnameInputAbove.classList = 'surnameInputAbove';
         $lastnameInput.value = client.lastName;
         $lastnameInput.classList.add('modalNameChange');
@@ -529,6 +534,20 @@ function createFormModal(divOpenContacts, btnOpenContacts, type = null, value = 
             $form.remove();
         }
     };
+
+    // let clientServer = {
+    //     name: $nameInput.value,
+    //     surname: $surnameInput.value,
+    //     lastName: $lastnameInput.value,
+    //     contacts: []
+    // };
+
+    // for (const child of $form.children) {
+    //     clientServer.contacts.push({
+    //         type: child.querySelector('select').value,
+    //         value: child.querySelector('input').value
+    //     })
+    // }
 
     // $modalSaveButton.onclick = async function () {
     //     let clientServer = {

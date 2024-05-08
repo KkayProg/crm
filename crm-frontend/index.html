@@ -31,16 +31,20 @@
         <div class="container clients__container">
             <h1 class="clients__title">Клиенты</h1>
             <table class="clients__table">
-                <thead class="clients__thead">
-                    <th class="thId" data-column="ID">ID</th>
-                    <th class="thFio" data-column="fio">Фамилия Имя Отчество</th>
-                    <th data-column="createdAt">Дата и время создания</th>
-                    <th data-column="updatedAt">Последние изменения</th>
+                <thead id="clients__thead" class="clients__thead">
+                    <th id="thId" class="thId" data-column="ID">ID</th>
+                    <th id="thFio" class="thFio" data-column="fio">Фамилия Имя Отчество</th>
+                    <th id="thcreatedAt" class="createdAt" data-column="createdAt">Дата и время <br>создания</th>
+                    <th id="thupdatedAt" class="updatedAt" data-column="updatedAt">Последние <br>изменения</th>
                     <th data-column="contacts">Контакты</th>
                     <th data-column="activity">Действия</th>
                 </thead>
                 <tbody id="clients__tbody" class="clients__tbody"></tbody>
             </table>
+            <div class="loader">
+                <div class="spinner">
+                </div>
+            </div>
             <button id="openModal" class="clients__button">Добавить клиента</button>
             <div id="modal" class="modal">
             </div>

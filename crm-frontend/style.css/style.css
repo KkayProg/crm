@@ -1,11 +1,43 @@
+@font-face {
+    font-family: 'Open Sans';
+    src: url('/fonts/OpenSans-Bold.eot');
+    src: local('Open Sans Bold'), local('OpenSans-Bold'),
+        url('/fonts/OpenSansBold.woff2') format('woff2'),
+        url('/fonts/OpenSansBold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('/fonts/OpenSans-Regular.eot');
+    src: local('Open Sans Regular'), local('OpenSans-Regular'),
+        url('/fonts/OpenSansRegular.woff2') format('woff2'),
+        url('/fonts/OpenSansRegular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('/fonts/OpenSans-SemiBold.eot');
+    src: local('Open Sans SemiBold'), local('OpenSans-SemiBold'),
+        url('/fonts/OpenSansSemiBold.woff2') format('woff2'),
+        url('/fonts/OpenSansSemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+
 body {
+    font-family: 'Open Sans', sans-serif;
     margin: 0;
     background-color: #E5E5E5;
-    box-sizing: border-box;
+    box-sizing: border-box;  
 }
 
 .container {
-    max-width: 1024px;
+    max-width: 984px;
     margin: 0 auto;
 }
 
@@ -15,7 +47,7 @@ body {
 
 td {
     margin: 0;
-    padding: 20px;
+    padding: 11px;
     border: none;
 }
 
@@ -51,67 +83,100 @@ h2 {
     margin: 0;
 }
 
-.header__container {
+.header {
+    position: fixed;
     width: 100%;
-    padding: 20px;
     background-color: #FFFFFF;
-    margin-bottom: 40px;
+    z-index: 10;
+}
+
+.header__container {
+    align-items: center;
+    padding: 20px;
+}
+
+.header__logo {
+    margin-bottom: -5px;
 }
 
 .header__search {
     width: 100%;
-    margin-top: 3px;
-    margin-bottom: 3px;
     margin-left: 53px;
 }
 
 .search__input {
+    font-family: Open Sans;
     width: 560px;
     padding-left: 15px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 11px;
+    padding-bottom: 11px;
     font-size: 14px;
 }
 
 /* Clients */
 
-.clients__title {
-    margin: 0 20px;
-    margin-bottom: 26px;
-    font-size: 24px;
+
+.clients__container {
+    padding-top: 131px;
 }
 
-/* table  */
+.clients__title {
+    margin: 0;
+    margin-bottom: 9px;
+    font-size: 24px;
+    user-select: none;
+}
 
 .clients__table {
     width: 100%;
-    padding: 0 20px;
-    margin: 0;
     margin-bottom: 40px;
     font-size: 12px;
-    font-weight: 400;
-    line-height: 16px;
     color: #B0B0B0;
     border-spacing: 0px;
     border-collapse: collapse;
+    line-height: 16.34px;
 }
 
-.clients__thead {
-    height: 60px;
+thead th,
+thead tr {
+    height: 33px;
+    /* Пример установки высоты */
+}
+
+.clients__thead th {
+    padding-bottom: 8px;
+    padding-left: 11px;
+    user-select: none;
+    vertical-align: bottom;
+    font-weight: 400;
+    text-align: left;
 }
 
 .thId {
-    padding-right: 13px;
     color: #9873FF;
     background-image: url(../img/id.svg);
-    background-position: right center;
+    background-position: 33px 19px;
     background-repeat: no-repeat;
     cursor: pointer;
 }
 
 .thFio {
     background-image: url(../img/fio.svg);
-    background-position: 195px center;
+    background-position: 160px 19px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.createdAt {
+    background-image: url(../img/downArrow.svg);
+    background-position: 75px 21px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.updatedAt {
+    background-image: url(../img/downArrow.svg);
+    background-position: 86px 21px;
     background-repeat: no-repeat;
     cursor: pointer;
 }
@@ -132,7 +197,7 @@ h2 {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 11;
     left: 0;
     top: 0;
     width: 100%;
@@ -170,6 +235,11 @@ h2 {
     background-position: 26px 10px;
     background-repeat: no-repeat;
     cursor: pointer;
+    transition: font-size 0.2s ease-in-out;
+}
+
+.clients__button:hover {
+    font-size: 14px;
 }
 
 .btnSave {
@@ -210,9 +280,36 @@ h2 {
     letter-spacing: 0em;
     text-align: center;
     background-image: url(../img/plus.svg);
-    background-position: 120px center;
+    background-position: 110px center;
     background-repeat: no-repeat;
     cursor: pointer;
+}
+
+.errorMessage,
+.errorMessageNum {
+    font-family: Open Sans;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 13.62px;
+    text-align: center;
+    color: #F06A4D
+}
+
+
+
+.remainingContacts {
+    position: relative;
+    top: -5px;
+    padding: 3px;
+    width: 16px;
+    height: 16px;
+    font-family: Open Sans;
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 10.89px;
+    text-align: left;
+    border: 1px solid #9873FF;
+    border-radius: 50%;
 }
 
 .modalDelP {
@@ -415,4 +512,65 @@ table img {
     line-height: 14px;
     text-align: left;
     color: #B0B0B0;
+}
+
+/* подсказка при наведении на икунку контакта */
+/* .tooltip {
+    position: fixed;
+    padding: 15px;
+    text-align: center;
+    color: white;
+    background-color: black;
+} */
+.tooltip {
+    transition: visibility 0.2s, opacity 0.2s ease-in-out;
+    opacity: 0;
+    /* Начальное состояние: полностью прозрачно */
+}
+
+.icon-container:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+    /* При наведении подсказка становится видимой */
+}
+
+.tooltip-link {
+    color: #B89EFF;
+    /* Фиолетовый цвет текста */
+    text-decoration: underline;
+    /* Подчеркивание текста */
+    pointer-events: auto;
+    /* Восстанавливаем возможность взаимодействия с ссылкой */
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 300px;
+    margin-top: -40px;
+    margin-bottom: 20px;
+    background-color: #FFF;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #9873FF;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
